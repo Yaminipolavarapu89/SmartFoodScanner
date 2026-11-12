@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // User scan history rule:
+    // Only authenticated users can read, write, update, or delete their own scan history.
+    match /users/{userId}/history/{document=**} {
+      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Default fallback: deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
